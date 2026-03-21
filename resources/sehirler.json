@@ -1,0 +1,326 @@
+[
+  {
+    "SehirId": 1,
+    "SehirAdi": "ADANA"
+  },
+  {
+    "SehirId": 2,
+    "SehirAdi": "ADIYAMAN"
+  },
+  {
+    "SehirId": 3,
+    "SehirAdi": "AFYONKARAHİSAR"
+  },
+  {
+    "SehirId": 4,
+    "SehirAdi": "AĞRI"
+  },
+  {
+    "SehirId": 5,
+    "SehirAdi": "AMASYA"
+  },
+  {
+    "SehirId": 6,
+    "SehirAdi": "ANKARA"
+  },
+  {
+    "SehirId": 7,
+    "SehirAdi": "ANTALYA"
+  },
+  {
+    "SehirId": 8,
+    "SehirAdi": "ARTVİN"
+  },
+  {
+    "SehirId": 9,
+    "SehirAdi": "AYDIN"
+  },
+  {
+    "SehirId": 10,
+    "SehirAdi": "BALIKESİR"
+  },
+  {
+    "SehirId": 11,
+    "SehirAdi": "BİLECİK"
+  },
+  {
+    "SehirId": 12,
+    "SehirAdi": "BİNGÖL"
+  },
+  {
+    "SehirId": 13,
+    "SehirAdi": "BİTLİS"
+  },
+  {
+    "SehirId": 14,
+    "SehirAdi": "BOLU"
+  },
+  {
+    "SehirId": 15,
+    "SehirAdi": "BURDUR"
+  },
+  {
+    "SehirId": 16,
+    "SehirAdi": "BURSA"
+  },
+  {
+    "SehirId": 17,
+    "SehirAdi": "ÇANAKKALE"
+  },
+  {
+    "SehirId": 18,
+    "SehirAdi": "ÇANKIRI"
+  },
+  {
+    "SehirId": 19,
+    "SehirAdi": "ÇORUM"
+  },
+  {
+    "SehirId": 20,
+    "SehirAdi": "DENİZLİ"
+  },
+  {
+    "SehirId": 21,
+    "SehirAdi": "DİYARBAKIR"
+  },
+  {
+    "SehirId": 22,
+    "SehirAdi": "EDİRNE"
+  },
+  {
+    "SehirId": 23,
+    "SehirAdi": "ELAZIĞ"
+  },
+  {
+    "SehirId": 24,
+    "SehirAdi": "ERZİNCAN"
+  },
+  {
+    "SehirId": 25,
+    "SehirAdi": "ERZURUM"
+  },
+  {
+    "SehirId": 26,
+    "SehirAdi": "ESKİŞEHİR"
+  },
+  {
+    "SehirId": 27,
+    "SehirAdi": "GAZİANTEP"
+  },
+  {
+    "SehirId": 28,
+    "SehirAdi": "GİRESUN"
+  },
+  {
+    "SehirId": 29,
+    "SehirAdi": "GÜMÜŞHANE"
+  },
+  {
+    "SehirId": 30,
+    "SehirAdi": "HAKKARİ"
+  },
+  {
+    "SehirId": 31,
+    "SehirAdi": "HATAY"
+  },
+  {
+    "SehirId": 32,
+    "SehirAdi": "ISPARTA"
+  },
+  {
+    "SehirId": 33,
+    "SehirAdi": "MERSİN"
+  },
+  {
+    "SehirId": 34,
+    "SehirAdi": "İSTANBUL"
+  },
+  {
+    "SehirId": 35,
+    "SehirAdi": "İZMİR"
+  },
+  {
+    "SehirId": 36,
+    "SehirAdi": "KARS"
+  },
+  {
+    "SehirId": 37,
+    "SehirAdi": "KASTAMONU"
+  },
+  {
+    "SehirId": 38,
+    "SehirAdi": "KAYSERİ"
+  },
+  {
+    "SehirId": 39,
+    "SehirAdi": "KIRKLARELİ"
+  },
+  {
+    "SehirId": 40,
+    "SehirAdi": "KIRŞEHİR"
+  },
+  {
+    "SehirId": 41,
+    "SehirAdi": "KOCAELİ"
+  },
+  {
+    "SehirId": 42,
+    "SehirAdi": "KONYA"
+  },
+  {
+    "SehirId": 43,
+    "SehirAdi": "KÜTAHYA"
+  },
+  {
+    "SehirId": 44,
+    "SehirAdi": "MALATYA"
+  },
+  {
+    "SehirId": 45,
+    "SehirAdi": "MANİSA"
+  },
+  {
+    "SehirId": 46,
+    "SehirAdi": "KAHRAMANMARAŞ"
+  },
+  {
+    "SehirId": 47,
+    "SehirAdi": "MARDİN"
+  },
+  {
+    "SehirId": 48,
+    "SehirAdi": "MUĞLA"
+  },
+  {
+    "SehirId": 49,
+    "SehirAdi": "MUŞ"
+  },
+  {
+    "SehirId": 50,
+    "SehirAdi": "NEVŞEHİR"
+  },
+  {
+    "SehirId": 51,
+    "SehirAdi": "NİĞDE"
+  },
+  {
+    "SehirId": 52,
+    "SehirAdi": "ORDU"
+  },
+  {
+    "SehirId": 53,
+    "SehirAdi": "RİZE"
+  },
+  {
+    "SehirId": 54,
+    "SehirAdi": "SAKARYA"
+  },
+  {
+    "SehirId": 55,
+    "SehirAdi": "SAMSUN"
+  },
+  {
+    "SehirId": 56,
+    "SehirAdi": "SİİRT"
+  },
+  {
+    "SehirId": 57,
+    "SehirAdi": "SİNOP"
+  },
+  {
+    "SehirId": 58,
+    "SehirAdi": "SİVAS"
+  },
+  {
+    "SehirId": 59,
+    "SehirAdi": "TEKİRDAĞ"
+  },
+  {
+    "SehirId": 60,
+    "SehirAdi": "TOKAT"
+  },
+  {
+    "SehirId": 61,
+    "SehirAdi": "TRABZON"
+  },
+  {
+    "SehirId": 62,
+    "SehirAdi": "TUNCELİ"
+  },
+  {
+    "SehirId": 63,
+    "SehirAdi": "ŞANLIURFA"
+  },
+  {
+    "SehirId": 64,
+    "SehirAdi": "UŞAK"
+  },
+  {
+    "SehirId": 65,
+    "SehirAdi": "VAN"
+  },
+  {
+    "SehirId": 66,
+    "SehirAdi": "YOZGAT"
+  },
+  {
+    "SehirId": 67,
+    "SehirAdi": "ZONGULDAK"
+  },
+  {
+    "SehirId": 68,
+    "SehirAdi": "AKSARAY"
+  },
+  {
+    "SehirId": 69,
+    "SehirAdi": "BAYBURT"
+  },
+  {
+    "SehirId": 70,
+    "SehirAdi": "KARAMAN"
+  },
+  {
+    "SehirId": 71,
+    "SehirAdi": "KIRIKKALE"
+  },
+  {
+    "SehirId": 72,
+    "SehirAdi": "BATMAN"
+  },
+  {
+    "SehirId": 73,
+    "SehirAdi": "ŞIRNAK"
+  },
+  {
+    "SehirId": 74,
+    "SehirAdi": "BARTIN"
+  },
+  {
+    "SehirId": 75,
+    "SehirAdi": "ARDAHAN"
+  },
+  {
+    "SehirId": 76,
+    "SehirAdi": "IĞDIR"
+  },
+  {
+    "SehirId": 77,
+    "SehirAdi": "YALOVA"
+  },
+  {
+    "SehirId": 78,
+    "SehirAdi": "KARABÜK"
+  },
+  {
+    "SehirId": 79,
+    "SehirAdi": "KİLİS"
+  },
+  {
+    "SehirId": 80,
+    "SehirAdi": "OSMANİYE"
+  },
+  {
+    "SehirId": 81,
+    "SehirAdi": "DÜZCE"
+  }
+]
