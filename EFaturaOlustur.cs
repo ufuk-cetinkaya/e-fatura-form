@@ -17,6 +17,7 @@ public partial class EFaturaOlustur : Form
     private readonly List<Sehir> _musteriSehirler;
     private readonly List<Ilce> _saticiIlceler;
     private readonly List<Ilce> _musteriIlceler;
+    private readonly HttpClient _client;
 
     public EFaturaOlustur()
     {
@@ -38,6 +39,10 @@ public partial class EFaturaOlustur : Form
         fs2.Position = 0;
         _musteriIlceler = JsonSerializer.Deserialize<List<Ilce>>(fs2) ??
             throw new Exception("Ýlçeler Yüklenemedi");
+
+        _client = InsecureHttpClient();
+        _client.BaseAddress = new Uri(ConfigurationManager.AppSettings.Get("DocumentApiUrl") ??
+            throw new InvalidOperationException("DocumentApiUrl is not configured."));
     }
 
     private void Fatura_Load(object sender, EventArgs e)
@@ -723,9 +728,8 @@ public partial class EFaturaOlustur : Form
         return htmlPath;
     }
 
-    private static async Task SendDocument(byte[] data)
+    private async Task SendDocument(byte[] data)
     {
-        using HttpClient client = InsecureHttpClient();
         using MemoryStream ms = new();
         using (GZipStream gzip = new(ms, CompressionLevel.Optimal, true))
         {
@@ -735,7 +739,9 @@ public partial class EFaturaOlustur : Form
         StreamContent content = new(ms);
         content.Headers.ContentEncoding.Add("gzip");
         content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-        HttpResponseMessage response = await client.PostAsync(ConfigurationManager.AppSettings.Get("DocumentApiUrl"), content);
+        HttpRequestMessage request = new(HttpMethod.Post, "upload");
+        request.Content = content;
+        HttpResponseMessage response = await _client.SendAsync(request);
         response.EnsureSuccessStatusCode();
     }
 
