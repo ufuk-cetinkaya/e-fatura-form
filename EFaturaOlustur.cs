@@ -1,3 +1,4 @@
+using EFaturaForm.Model;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO.Compression;
@@ -12,6 +13,7 @@ namespace EFaturaForm;
 
 public partial class EFaturaOlustur : Form
 {
+    private readonly string _token;
     private readonly DocumentReferenceType _template;
     private readonly List<Sehir> _saticiSehirler;
     private readonly List<Sehir> _musteriSehirler;
@@ -19,10 +21,10 @@ public partial class EFaturaOlustur : Form
     private readonly List<Ilce> _musteriIlceler;
     private readonly HttpClient _client;
 
-    public EFaturaOlustur()
+    public EFaturaOlustur(string token)
     {
         InitializeComponent();
-
+        _token = token;
         _template = Template();
 
         using FileStream fs1 = File.OpenRead("resources/sehirler.json");
@@ -41,7 +43,7 @@ public partial class EFaturaOlustur : Form
             throw new Exception("Ýlçeler Yüklenemedi");
 
         _client = InsecureHttpClient();
-        _client.BaseAddress = new Uri(ConfigurationManager.AppSettings.Get("DocumentApiUrl") ??
+        _client.BaseAddress = new Uri(ConfigurationManager.AppSettings.Get("ApiUrl") ??
             throw new InvalidOperationException("DocumentApiUrl is not configured."));
     }
 
@@ -739,7 +741,8 @@ public partial class EFaturaOlustur : Form
         StreamContent content = new(ms);
         content.Headers.ContentEncoding.Add("gzip");
         content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-        HttpRequestMessage request = new(HttpMethod.Post, "upload");
+        HttpRequestMessage request = new(HttpMethod.Post, "/document/upload");
+        request.Headers.Add("Authorization", $"Bearer {_token}");
         request.Content = content;
         HttpResponseMessage response = await _client.SendAsync(request);
         response.EnsureSuccessStatusCode();

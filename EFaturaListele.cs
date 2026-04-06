@@ -1,11 +1,15 @@
-﻿using System.Configuration;
+﻿using EFaturaForm.Model;
+using System.Configuration;
 using System.Diagnostics;
+using System.IO.Compression;
+using System.Net;
 using System.Text.Json;
 
 namespace EFaturaForm;
 
 public partial class EFaturaListele : Form
 {
+    private string _token;
     private readonly HttpClient _client;
 
     public EFaturaListele()
@@ -14,13 +18,13 @@ public partial class EFaturaListele : Form
         FillDirection(direction);
 
         _client = InsecureHttpClient();
-        _client.BaseAddress = new Uri(ConfigurationManager.AppSettings.Get("DocumentApiUrl") ??
-            throw new InvalidOperationException("API adresi bildirilmelidir."));
+        _client.BaseAddress = new Uri(ConfigurationManager.AppSettings.Get("ApiUrl") ??
+            throw new Exception("API adresi bildirilmelidir."));
     }
 
     private void Create_Click(object sender, EventArgs e)
     {
-        EFaturaOlustur fatura = new();
+        EFaturaOlustur fatura = new(_token);
         fatura.Show();
     }
 
@@ -29,12 +33,17 @@ public partial class EFaturaListele : Form
         try
         {
             string? ettn = invoiceList.CurrentRow?.Cells["Ettn"].Value?.ToString();
-            string requestUri = $"cancel/{ettn}";
+            string requestUri = $"/document/cancel/{ettn}";
             HttpRequestMessage request = new(HttpMethod.Delete, requestUri);
+            request.Headers.Add("Authorization", $"Bearer {_token}");
             HttpResponseMessage response = await _client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
                 MessageBox.Show("Fatura iptal edildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                MessageBox.Show("Giriş yaptıktan sonra tekrar deneyiniz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             else
             {
@@ -43,8 +52,7 @@ public partial class EFaturaListele : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Fatura listesi alınamadı. API bağlantısını kontrol ediniz.",
-                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Servisle bağlantı kurulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Directory.CreateDirectory("log");
             File.AppendAllText("log/error.log", ex.StackTrace);
         }
@@ -54,8 +62,9 @@ public partial class EFaturaListele : Form
     {
         try
         {
-            string requestUri = $"?documenttype=INVOICE&direction={direction.SelectedValue}&startdate={startDate.Value}&enddate={endDate.Value}";
+            string requestUri = $"/document?documenttype=INVOICE&direction={direction.SelectedValue}&startdate={startDate.Value}&enddate={endDate.Value}";
             HttpRequestMessage request = new(HttpMethod.Get, requestUri);
+            request.Headers.Add("Authorization", $"Bearer {_token}");
             HttpResponseMessage response = await _client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
@@ -63,38 +72,59 @@ public partial class EFaturaListele : Form
                 {
                     PropertyNameCaseInsensitive = true
                 };
-                string jsonResponse = response.Content.ReadAsStringAsync().Result;
-                List<DocumentDto>? documents = JsonSerializer.Deserialize<List<DocumentDto>>(jsonResponse, options);
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                List<Document>? documents = JsonSerializer.Deserialize<List<Document>>(jsonResponse, options);
                 invoiceList.DataSource = documents;
+                if (documents == null || documents.Count == 0)
+                {
+                    MessageBox.Show("Kriterlere uygun kayıt bulunamadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
-            else
+            else if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                MessageBox.Show("Filtereye uygun kayıt bulunamadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Giriş yaptıktan sonra tekrar deneyiniz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Fatura listesi alınamadı. API bağlantısını kontrol ediniz.",
-                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Servisle bağlantı kurulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Directory.CreateDirectory("log");
             File.AppendAllText("log/error.log", ex.StackTrace);
         }
     }
 
-    private void View_Click(object sender, EventArgs e)
+    private async void View_Click(object sender, EventArgs e)
     {
         try
         {
             string? ettn = invoiceList.CurrentRow?.Cells["Ettn"].Value?.ToString();
-            string requestUri = $"preview/{ettn}/html";
+            string requestUri = $"/document/preview/{ettn}/html";
             HttpRequestMessage request = new(HttpMethod.Get, requestUri);
-            HttpResponseMessage response = _client.SendAsync(request).Result;
+            request.Headers.Add("Authorization", $"Bearer {_token}");
+            request.Headers.AcceptEncoding.Add(new System.Net.Http.Headers.StringWithQualityHeaderValue("gzip"));
+            HttpResponseMessage response = _client.Send(request);
             if (response.IsSuccessStatusCode)
             {
-                string htmlContent = response.Content.ReadAsStringAsync().Result;
+                string htmlContent;
+                if (response.Content.Headers.ContentEncoding.Contains("gzip"))
+                {
+                    using Stream responseStream = response.Content.ReadAsStream();
+                    using GZipStream decompressionStream = new(responseStream, CompressionMode.Decompress);
+                    using StreamReader reader = new(decompressionStream);
+                    htmlContent = reader.ReadToEnd();
+                }
+                else
+                {
+                    htmlContent = await response.Content.ReadAsStringAsync();
+                }
                 string htmlPath = $"invoice/{ettn}.html";
+                Directory.CreateDirectory("invoice");
                 File.WriteAllText(htmlPath, htmlContent);
                 Preview(htmlPath);
+            }
+            else if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                MessageBox.Show("Giriş yaptıktan sonra tekrar deneyiniz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             else
             {
@@ -103,8 +133,7 @@ public partial class EFaturaListele : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Fatura listesi alınamadı. API bağlantısını kontrol ediniz.",
-                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Servisle bağlantı kurulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Directory.CreateDirectory("log");
             File.AppendAllText("log/error.log", ex.StackTrace);
         }
@@ -149,5 +178,15 @@ public partial class EFaturaListele : Form
     private void Clear_Click(object sender, EventArgs e)
     {
         invoiceList.DataSource = null;
+    }
+
+    private void Login_Click(object sender, EventArgs e)
+    {
+        GirisYap login = new();
+
+        if (login.ShowDialog() == DialogResult.OK)
+        {
+            _token = login.Token;
+        }
     }
 }

@@ -37,11 +37,13 @@
             direction = new ComboBox();
             create = new Button();
             clear = new Button();
+            login = new Button();
             ((System.ComponentModel.ISupportInitialize)invoiceList).BeginInit();
             SuspendLayout();
             // 
             // invoiceList
             // 
+            invoiceList.AllowUserToOrderColumns = true;
             invoiceList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             invoiceList.Location = new Point(12, 67);
             invoiceList.Name = "invoiceList";
@@ -120,11 +122,22 @@
             clear.UseVisualStyleBackColor = true;
             clear.Click += Clear_Click;
             // 
+            // login
+            // 
+            login.Location = new Point(876, 8);
+            login.Name = "login";
+            login.Size = new Size(75, 23);
+            login.TabIndex = 9;
+            login.Text = "Giriş Yap";
+            login.UseVisualStyleBackColor = true;
+            login.Click += Login_Click;
+            // 
             // EFaturaListele
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(963, 450);
+            Controls.Add(login);
             Controls.Add(clear);
             Controls.Add(create);
             Controls.Add(direction);
@@ -151,5 +164,6 @@
         private ComboBox direction;
         private Button create;
         private Button clear;
+        private Button login;
     }
 }
