@@ -9,17 +9,22 @@ namespace EFaturaForm;
 
 public partial class EFaturaListele : Form
 {
-    private string _token;
+    private string _token = "";
     private readonly HttpClient _client;
 
     public EFaturaListele()
     {
         InitializeComponent();
+
         FillDirection(direction);
 
         _client = InsecureHttpClient();
         _client.BaseAddress = new Uri(ConfigurationManager.AppSettings.Get("ApiUrl") ??
             throw new Exception("API adresi bildirilmelidir."));
+
+        Login();
+
+        pageSize.SelectedIndex = 0;
     }
 
     private void Create_Click(object sender, EventArgs e)
@@ -52,45 +57,13 @@ public partial class EFaturaListele : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Servisle bağlantı kurulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Directory.CreateDirectory("log");
-            File.AppendAllText("log/error.log", ex.StackTrace);
+            GlobalError(ex.StackTrace);
         }
     }
 
     private async void List_Click(object sender, EventArgs e)
     {
-        try
-        {
-            string requestUri = $"/document?documenttype=INVOICE&direction={direction.SelectedValue}&startdate={startDate.Value}&enddate={endDate.Value}";
-            HttpRequestMessage request = new(HttpMethod.Get, requestUri);
-            request.Headers.Add("Authorization", $"Bearer {_token}");
-            HttpResponseMessage response = await _client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                JsonSerializerOptions options = new()
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                List<Document>? documents = JsonSerializer.Deserialize<List<Document>>(jsonResponse, options);
-                invoiceList.DataSource = documents;
-                if (documents == null || documents.Count == 0)
-                {
-                    MessageBox.Show("Kriterlere uygun kayıt bulunamadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            else if (response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                MessageBox.Show("Giriş yaptıktan sonra tekrar deneyiniz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("Servisle bağlantı kurulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Directory.CreateDirectory("log");
-            File.AppendAllText("log/error.log", ex.StackTrace);
-        }
+        await List();
     }
 
     private async void View_Click(object sender, EventArgs e)
@@ -133,9 +106,7 @@ public partial class EFaturaListele : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Servisle bağlantı kurulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Directory.CreateDirectory("log");
-            File.AppendAllText("log/error.log", ex.StackTrace);
+            GlobalError(ex.StackTrace);
         }
     }
 
@@ -182,11 +153,107 @@ public partial class EFaturaListele : Form
 
     private void Login_Click(object sender, EventArgs e)
     {
-        GirisYap login = new();
+        Login();
+    }
 
+    private void Login ()
+    {
+        GirisYap login = new();
         if (login.ShowDialog() == DialogResult.OK)
         {
             _token = login.Token;
+        }
+    }
+
+    private async Task List()
+    {
+        try
+        {
+            string requestUri = $"/document?documenttype=INVOICE&direction={direction.SelectedValue}&startdate={startDate.Value}&enddate={endDate.Value}&page={page.Text}&pagesize={pageSize.Text}";
+            HttpRequestMessage request = new(HttpMethod.Get, requestUri);
+            request.Headers.Add("Authorization", $"Bearer {_token}");
+            HttpResponseMessage response = await _client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                JsonSerializerOptions options = new()
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                Page? page = JsonSerializer.Deserialize<Page>(jsonResponse, options);
+                first.Enabled = !page.IsFirstPage;
+                previous.Enabled = page.HasPreviousPage;
+                next.Enabled = page.HasNextPage;
+                last.Enabled = !page.IsLastPage;
+                totalRecords.Text = $"Toplam Kayıt: {page.TotalRecords}";
+                pageCount.Text = $"Toplam Sayfa: {page.PageCount}";
+                invoiceList.DataSource = page.Data;
+                if (page.Data == null || page.Data.Count() == 0)
+                {
+                    MessageBox.Show("Kriterlere uygun kayıt bulunamadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                MessageBox.Show("Giriş yaptıktan sonra tekrar deneyiniz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            GlobalError(ex.StackTrace);
+        }
+    }
+
+    private static void GlobalError(string? message)
+    {
+        MessageBox.Show("Servisle bağlantı kurulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        Directory.CreateDirectory("log");
+        File.AppendAllText("log/error.log", message);
+    }
+
+    private void First_Click(object sender, EventArgs e)
+    {
+        page.Text = "1";
+    }
+
+    private void Previous_Click(object sender, EventArgs e)
+    {
+        if (int.TryParse(page.Text, out int currentPage) && currentPage > 1)
+        {
+            page.Text = (currentPage - 1).ToString();
+        }
+    }
+
+    private void Next_Click(object sender, EventArgs e)
+    {
+        if (int.TryParse(page.Text, out int currentPage))
+        {
+            page.Text = (currentPage + 1).ToString();
+        }
+    }
+
+    private void Last_Click(object sender, EventArgs e)
+    {
+        if (int.TryParse(pageCount.Text.Replace("Toplam Sayfa: ", ""), out int totalPages))
+        {
+            page.Text = totalPages.ToString();
+        }
+    }
+
+    private async void Page_TextChanged(object sender, EventArgs e)
+    {
+        if (int.TryParse(page.Text, out int pageNumber) && pageNumber > 0)
+        {
+            await List();
+        }
+    }
+
+    private async void PageSize_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (int.TryParse(pageSize.Text, out int _))
+        {
+            page.Text = "1";
+            await List();
         }
     }
 }
