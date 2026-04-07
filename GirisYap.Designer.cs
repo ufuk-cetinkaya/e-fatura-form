@@ -37,7 +37,7 @@
             // 
             // login
             // 
-            login.Location = new Point(73, 93);
+            login.Location = new Point(91, 93);
             login.Name = "login";
             login.Size = new Size(75, 23);
             login.TabIndex = 0;
@@ -47,23 +47,23 @@
             // 
             // username
             // 
-            username.Location = new Point(102, 24);
+            username.Location = new Point(91, 24);
             username.Name = "username";
-            username.Size = new Size(100, 23);
+            username.Size = new Size(134, 23);
             username.TabIndex = 1;
             // 
             // password
             // 
-            password.Location = new Point(102, 53);
+            password.Location = new Point(91, 53);
             password.Name = "password";
-            password.Size = new Size(100, 23);
+            password.Size = new Size(134, 23);
             password.TabIndex = 2;
             password.UseSystemPasswordChar = true;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(26, 27);
+            label1.Location = new Point(12, 28);
             label1.Name = "label1";
             label1.Size = new Size(73, 15);
             label1.TabIndex = 3;
@@ -72,7 +72,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(26, 56);
+            label2.Location = new Point(12, 56);
             label2.Name = "label2";
             label2.Size = new Size(30, 15);
             label2.TabIndex = 4;
