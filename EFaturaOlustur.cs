@@ -106,16 +106,27 @@ public partial class EFaturaOlustur : Form
 
     private void Kaydet_Click(object sender, EventArgs e)
     {
-        try
+        SaveFileDialog saveFileDialog = new();
+        saveFileDialog.Title = "Faturayý Kaydet";
+        saveFileDialog.Filter = "Xml Dosyalarý (*.xml)|*.xml|Tüm Dosyalar (*.*)|*.*";
+        saveFileDialog.DefaultExt = "xml";
+        saveFileDialog.FileName = $"{faturaNo.Text}_{ettn.Text}";
+        if (saveFileDialog.ShowDialog() == DialogResult.OK)
         {
-            Save();
-            MessageBox.Show("Fatura kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Directory.CreateDirectory("log");
-            File.AppendAllText("log/error.log", ex.StackTrace);
+            try
+            {
+                InvoiceType inv = CreateInvoice();
+                XmlDocument xmlDoc = Serialize(inv);
+                byte[] fatura = Encoding.UTF8.GetBytes(xmlDoc.OuterXml);
+                File.WriteAllBytes(saveFileDialog.FileName, fatura);
+                MessageBox.Show("Fatura kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Directory.CreateDirectory("log");
+                File.AppendAllText("log/error.log", ex.StackTrace);
+            }
         }
     }
 
