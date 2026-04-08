@@ -185,10 +185,10 @@ public partial class EFaturaListele : Form
                 previous.Enabled = page.HasPreviousPage;
                 next.Enabled = page.HasNextPage;
                 last.Enabled = !page.IsLastPage;
-                totalRecords.Text = $"Toplam Kayıt: {page.TotalRecords}";
-                pageCount.Text = $"Toplam Sayfa: {page.PageCount}";
+                totalRecords.Text = page.TotalRecords.ToString();
+                pageCount.Text = page.PageCount.ToString();
                 invoiceList.DataSource = page.Data;
-                if (page.Data == null || page.Data.Count() == 0)
+                if (page.Data == null || page.Data.Count == 0)
                 {
                     MessageBox.Show("Kriterlere uygun kayıt bulunamadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
@@ -234,7 +234,7 @@ public partial class EFaturaListele : Form
 
     private void Last_Click(object sender, EventArgs e)
     {
-        if (int.TryParse(pageCount.Text.Replace("Toplam Sayfa: ", ""), out int totalPages))
+        if (int.TryParse(pageCount.Text, out int totalPages))
         {
             page.Text = totalPages.ToString();
         }
